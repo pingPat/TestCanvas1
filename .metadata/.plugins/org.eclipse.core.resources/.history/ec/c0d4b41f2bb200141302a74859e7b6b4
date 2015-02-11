@@ -1,0 +1,107 @@
+package com.example.testcanvasv1;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+
+import android.support.v7.app.ActionBarActivity;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.location.Location;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
+
+
+public class MainActivity extends ActionBarActivity {
+
+	private static final String TAG = "Main";
+	private SensorManager mSensorManager;
+	private Sensor mSensor;
+	LocationClient locMgr;
+	
+	private final SensorEventListener mSensorListener = new SensorEventListener() {
+		public void onSensorChanged(SensorEvent event) {
+			Log.d(TAG, "sensorChanged (" + event.values[0] + ", " + event.values[1] + ", " + event.values[2] + ")");
+			
+		}
+
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		}
+	};
+	
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        setContentView(R.layout.activity_main);
+        
+        boolean result = isServicesAvailable();        
+        if(result) {
+            // ในเครื่องมี Google Play Services
+        	locMgr = new LocationClient(this, mCallback, mListener);
+        } else {
+            // ในเครื่องไม่มี Google Play Services ติดตั้งอยู่
+        	finish();
+        }
+
+    }
+    
+    protected void onStart(){
+    	super.onStart();
+    	locMgr.connect();
+    }
+    
+    protected void onStop(){
+    	super.onStop();
+    	locMgr.disconnect();
+    }
+    
+    private ConnectionCallbacks mCallback = new ConnectionCallbacks() {
+        public void onConnected(Bundle bundle) {
+            // เชื่อมต่อกับ Google Play Services ได้
+        	Toast.makeText(MainActivity.this, "Services connected", Toast.LENGTH_SHORT).show();
+
+            LocationRequest mRequest = new LocationRequest()
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                    .setInterval(5000).setFastestInterval(1000);
+
+            locMgr.requestLocationUpdates(mRequest, locationListener);
+        }
+
+        public void onDisconnected() {
+            // หยุดเชื่อมต่อกับ Google Play Services
+        	Toast.makeText(MainActivity.this, "Services disconnected", Toast.LENGTH_SHORT).show();
+        }
+    };
+    
+    private OnConnectionFailedListener mListener = new OnConnectionFailedListener() {
+        public void onConnectionFailed(ConnectionResult result) {
+            // เมื่อเปิดปัญหาเชื่อมต่อกับ Google Play Services ไม่ได้
+        	Toast.makeText(MainActivity.this, "Services connection failed", Toast.LENGTH_SHORT).show();
+        }
+    };
+    
+    private boolean isServicesAvailable() {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        return (resultCode == ConnectionResult.SUCCESS);
+    }
+
+    LocationListener locationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+        	Log.d(TAG, "Location Changed");
+        }
+    };
+
+    
+}

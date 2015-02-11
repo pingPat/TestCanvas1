@@ -1,0 +1,5 @@
+INDEX VERSION 1.126+D:\Tasks\TestAndroid\TestForGitHub\TestCanvas1\.metadata\.plugins\org.eclipse.jdt.core
+1841239900.index
+1284074322.index
+1610120687.index
+848856923.index

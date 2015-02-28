@@ -2033,7 +2033,7 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f0b0041;
         public static final int action_mode_bar_stub=0x7f0b0040;
         public static final int action_mode_close_button=0x7f0b0033;
-        public static final int action_settings=0x7f0b0055;
+        public static final int action_settings=0x7f0b0056;
         public static final int activity_chooser_view_content=0x7f0b0034;
         public static final int activity_main=0x7f0b0052;
         public static final int always=0x7f0b0025;
@@ -2100,6 +2100,7 @@ containing a value of this type.
         public static final int submit_area=0x7f0b004f;
         public static final int tabMode=0x7f0b001e;
         public static final int terrain=0x7f0b000d;
+        public static final int textView1=0x7f0b0055;
         public static final int title=0x7f0b003a;
         public static final int top=0x7f0b0030;
         public static final int up=0x7f0b0001;

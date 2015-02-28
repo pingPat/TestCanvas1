@@ -27,4 +27,8 @@
 <fullyQualifiedTypeName name="java.io.IOException"/>
 <fullyQualifiedTypeName name="java.util.List"/>
 <fullyQualifiedTypeName name="android.util.Log"/>
+<fullyQualifiedTypeName name="java.lang.NullPointerException"/>
+<fullyQualifiedTypeName name="android.widget.TextView"/>
+<fullyQualifiedTypeName name="android.text.style.TtsSpan"/>
+<fullyQualifiedTypeName name="android.location.LocationProvider"/>
 </qualifiedTypeNameHistroy>

@@ -440,7 +440,7 @@ int id action_menu_presenter 0x7f0b0006
 int id action_mode_bar 0x7f0b0041
 int id action_mode_bar_stub 0x7f0b0040
 int id action_mode_close_button 0x7f0b0033
-int id action_settings 0x7f0b0055
+int id action_settings 0x7f0b0056
 int id activity_chooser_view_content 0x7f0b0034
 int id activity_main 0x7f0b0052
 int id always 0x7f0b0025
@@ -507,6 +507,7 @@ int id strict_sandbox 0x7f0b0012
 int id submit_area 0x7f0b004f
 int id tabMode 0x7f0b001e
 int id terrain 0x7f0b000d
+int id textView1 0x7f0b0055
 int id title 0x7f0b003a
 int id top 0x7f0b0030
 int id up 0x7f0b0001

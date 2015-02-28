@@ -15,7 +15,8 @@ import android.view.View;
 
 public class DrawSurfaceView extends View {
 
-	Point me = new Point(-33.870932d, 151.204727d, "Me");
+	//Point me = new Point(33.870932d, 151.204727d, "Me");
+	Point me = new Point(0d, 0d, "Me");
 	Paint mPaint = new Paint();
 	Matrix transform = new Matrix();
 	private double OFFSET = 0d; //we aren't using this yet, that will come in the next step
@@ -67,13 +68,33 @@ public class DrawSurfaceView extends View {
 			Bitmap spot = mSpots[i];
 			Point u = props.get(i);
 			
-			if (spot == null ||  blip == null)
-				continue;
+			/*if (spot == null ||  blip == null)
+				continue;*/
 			
+			if (spot == null)
+		        continue;
+
+		    double angle = bearing(me.latitude, me.longitude, u.latitude, u.longitude) - OFFSET;
+		    double xPos, yPos;
+			
+		    if(angle < 0)
+		        angle = (angle+360)%360;
+
+		    double posInPx = angle * (screenWidth / 90d);
+		    
 			int spotCentreX = spot.getWidth() / 2;
 			int spotCentreY = spot.getHeight() / 2;
+			xPos = posInPx - spotCentreX;
 			
-			u.x = (float)screenWidth/3 * (i) - spotCentreX;
+			if (angle <= 45) 
+		        u.x = (float) ((screenWidth / 2) + xPos);
+
+		    else if (angle >= 315) 
+		        u.x = (float) ((screenWidth / 2) - ((screenWidth*4) - xPos));
+
+		    else
+		        u.x = (float) (float)(screenWidth*9); //somewhere off the screen
+			
 			u.y = (float)screenHeight/2 + (50*i) - spotCentreY; 
 			
 			canvas.drawBitmap(spot, u.x, u.y, mPaint);
@@ -88,6 +109,37 @@ public class DrawSurfaceView extends View {
 	public void setMyLocation(double latitude, double longitude) {
 		me.latitude = latitude;
 		me.longitude = longitude;
+	}
+	
+	protected double distInMetres(Point me, Point u) {
+
+		double lat1 = me.latitude;
+		double lng1 = me.longitude;
+
+		double lat2 = u.latitude;
+		double lng2 = u.longitude;
+
+		double earthRadius = 6371;
+		double dLat = Math.toRadians(lat2 - lat1);
+		double dLng = Math.toRadians(lng2 - lng1);
+		double sindLat = Math.sin(dLat / 2);
+		double sindLng = Math.sin(dLng / 2);
+		double a = Math.pow(sindLat, 2) + Math.pow(sindLng, 2) * Math.cos(lat1) * Math.cos(lat2);
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		double dist = earthRadius * c;
+
+		return dist * 1000;
+	}
+
+	protected static double bearing(double lat1, double lon1, double lat2, double lon2) {
+		double longDiff = Math.toRadians(lon2 - lon1);
+		double la1 = Math.toRadians(lat1);
+		double la2 = Math.toRadians(lat2);
+		double y = Math.sin(longDiff) * Math.cos(la2);
+		double x = Math.cos(la1) * Math.sin(la2) - Math.sin(la1) * Math.cos(la2) * Math.cos(longDiff);
+
+		double result = Math.toDegrees(Math.atan2(y, x));
+		return (result+360.0d)%360.0d;
 	}
 	
 }

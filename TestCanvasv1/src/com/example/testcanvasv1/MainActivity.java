@@ -9,7 +9,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
 import android.support.v7.app.ActionBarActivity;
-import android.text.style.TtsSpan;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -20,7 +19,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 
@@ -28,18 +28,46 @@ public class MainActivity extends ActionBarActivity {
 
 	private static final String TAG = "Main";
 	private SensorManager mSensorManager;
-	private Sensor mSensor;
+	private Sensor mSensor,accelerometer,magnetometer;
+	int i;
+	float[] mGravity;
+    float[] mGeomagnetic;
+    float degree,azimuthInDegress;
 	private DrawSurfaceView mDrawView;
+	double lat = -33.870932;
+	double lng = 151.204727;
 	LocationClient locMgr;
-	TextView textt;
 	
 	private final SensorEventListener mSensorListener = new SensorEventListener() {
 		public void onSensorChanged(SensorEvent event) {
 			//Log.e(TAG, "sensorChanged (" + event.values[0] + ", " + event.values[1] + ", " + event.values[2] + ")");
-			
+			if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+	            mGravity = event.values;
+	        }
+	        if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+	            mGeomagnetic = event.values;
+	        if (mGravity != null && mGeomagnetic != null) {
+	            float R[] = new float[9];
+	            float I[] = new float[9];
+	            boolean success = SensorManager.getRotationMatrix(R, I, mGravity, mGeomagnetic);
+	            if (success) {
+	            	float orientation[] = new float[3];
+	            	SensorManager.getOrientation(R, orientation);
+	            	degree = orientation[0]; // orientation contains: azimut, pitch and roll
+	            	azimuthInDegress = (float)Math.toDegrees(degree);
+	            	if (azimuthInDegress < 0.0f) {
+	            		azimuthInDegress += 360.0f;
+	            	}           	
+	            }
+	        }
+	        
+	        float true_deg = true_compass(azimuthInDegress);
+	        
 			if (mDrawView != null) {
-				mDrawView.setOffset(event.values[0]);
-				//mDrawView.setMyLocation(13.7292394, 100.7772206);
+				mDrawView.setOffset(true_deg);
+				//mDrawView.setOffset(event.values[0]);
+				//mDrawView.setMyLocation(lat, lng);
+				//Log.e(TAG, "setMyLocation : " + lat + "," + lng);
 				mDrawView.invalidate();
 			}
 		}
@@ -48,13 +76,29 @@ public class MainActivity extends ActionBarActivity {
 		}
 	};
 	
+	public static float true_compass(float deg){ //True degree when watching AR
+		float t_de = deg+90;
+        if(t_de>360){
+        	t_de = t_de-360;
+        }else if(t_de<0){
+        	t_de = 360+t_de;
+        }
+        return t_de;
+	}
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    	requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN 
+                | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    	super.onCreate(savedInstanceState);
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-        setContentView(R.layout.activity_main);
-        textt = (TextView) findViewById(R.id.textView1);
+		accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+		setContentView(R.layout.activity_main);
+		
+		mDrawView = (DrawSurfaceView) findViewById(R.id.drawSurfaceView);
         
         boolean result = isServicesAvailable();        
         if(result) {
@@ -73,6 +117,8 @@ public class MainActivity extends ActionBarActivity {
 		super.onResume();
 
 		mSensorManager.registerListener(mSensorListener, mSensor, SensorManager.SENSOR_DELAY_GAME);
+		mSensorManager.registerListener(mSensorListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(mSensorListener, magnetometer, SensorManager.SENSOR_DELAY_UI);
 	}
     
     protected void onStart(){
@@ -94,24 +140,9 @@ public class MainActivity extends ActionBarActivity {
 
             LocationRequest mRequest = new LocationRequest()
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                    .setInterval(0).setFastestInterval(0);
+                    .setInterval(5000).setFastestInterval(1000);
 
-            locMgr.requestLocationUpdates(mRequest, new LocationListener() {
-                public void onLocationChanged(Location location) {
-                	Log.e(TAG, "Location Changed : " + location.getLatitude() + "," + location.getLongitude());
-                	try{
-                		//mDrawView.setMyLocation(location.getLatitude(), location.getLongitude());
-                		mDrawView.me.latitude = location.getLatitude();
-                		mDrawView.me.longitude = location.getLongitude();
-                		mDrawView.invalidate();
-                	}catch(NullPointerException e){
-                		e.printStackTrace();
-                		Log.e(TAG, "Null");
-                		Log.e(TAG, "Description : ", e);
-                		textt.setText("Error");
-                	}
-                }
-            });
+            locMgr.requestLocationUpdates(mRequest, locationListener);
         }
 
         public void onDisconnected() {
@@ -132,20 +163,16 @@ public class MainActivity extends ActionBarActivity {
         return (resultCode == ConnectionResult.SUCCESS);
     }
 
-    
-    /*LocationListener locationListener = new LocationListener() {
+    LocationListener locationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
         	Log.e(TAG, "Location Changed : " + location.getLatitude() + "," + location.getLongitude());
-        	try{
-        		mDrawView.setMyLocation(location.getLatitude(), location.getLongitude());
-        		mDrawView.invalidate();
-        	}catch(NullPointerException e){
-        		e.printStackTrace();
-        		Log.e(TAG, "Null");
-        		Log.e(TAG, "Description : ", e);
-        		textt.setText("Error");
-        	}
+        	//lat = location.getLatitude();
+        	//lng = location.getLongitude();
+        	//mDrawView.setMyLocation(-33.870932, 151.204727);
+        	mDrawView.setMyLocation(location.getLatitude(), location.getLongitude());
+			mDrawView.invalidate();
         }
-    };*/
+    };
+
     
 }

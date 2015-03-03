@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.Window;
+import android.view.WindowManager;
 
 public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -18,7 +20,7 @@ public class CameraSurfaceView extends SurfaceView implements SurfaceHolder.Call
 	
 	public CameraSurfaceView(Context context) {
 		super(context);
-
+		
 		// Initiate the Surface Holder properly
 		this.holder = this.getHolder();
 		this.holder.addCallback(this);

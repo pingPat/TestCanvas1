@@ -440,7 +440,7 @@ int id action_menu_presenter 0x7f0b0006
 int id action_mode_bar 0x7f0b0041
 int id action_mode_bar_stub 0x7f0b0040
 int id action_mode_close_button 0x7f0b0033
-int id action_settings 0x7f0b0056
+int id action_settings 0x7f0b0055
 int id activity_chooser_view_content 0x7f0b0034
 int id activity_main 0x7f0b0052
 int id always 0x7f0b0025
@@ -507,7 +507,6 @@ int id strict_sandbox 0x7f0b0012
 int id submit_area 0x7f0b004f
 int id tabMode 0x7f0b001e
 int id terrain 0x7f0b000d
-int id textView1 0x7f0b0055
 int id title 0x7f0b003a
 int id top 0x7f0b0030
 int id up 0x7f0b0001
@@ -837,6 +836,7 @@ int style Widget_AppCompat_Spinner_DropDown 0x7f050020
 int style Widget_AppCompat_Spinner_DropDown_ActionBar 0x7f050021
 int style Widget_AppCompat_Toolbar 0x7f050039
 int style Widget_AppCompat_Toolbar_Button_Navigation 0x7f05003a
+int style my_style 0x7f0500f2
 int[] styleable ActionBar { 0x7f010020, 0x7f010021, 0x7f01004c, 0x7f010075, 0x7f010076, 0x7f010077, 0x7f010078, 0x7f010079, 0x7f01007a, 0x7f01007b, 0x7f01007c, 0x7f01007d, 0x7f01007e, 0x7f01007f, 0x7f010080, 0x7f010081, 0x7f010082, 0x7f010083, 0x7f010084, 0x7f010085, 0x7f010086, 0x7f010087, 0x7f010088, 0x7f010089, 0x7f01008a, 0x7f01008b, 0x7f01008c }
 int styleable ActionBar_background 11
 int styleable ActionBar_backgroundSplit 13

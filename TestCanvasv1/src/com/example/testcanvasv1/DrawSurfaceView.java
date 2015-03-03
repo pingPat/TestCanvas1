@@ -9,26 +9,32 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Paint.FontMetrics;
+import android.graphics.Paint.Style;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 public class DrawSurfaceView extends View {
 
-	//Point me = new Point(33.870932d, 151.204727d, "Me");
-	Point me = new Point(0d, 0d, "Me");
+	Point me = new Point(-33.870932d, 151.204727d, "Me");
 	Paint mPaint = new Paint();
-	Matrix transform = new Matrix();
 	private double OFFSET = 0d; //we aren't using this yet, that will come in the next step
 	private double screenWidth, screenHeight = 0d;
 	private Bitmap[] mSpots, mBlips;
 	
+	//Paint rPaint = new Paint();
+	Paint tPaint = new Paint();
+	FontMetrics fm = new FontMetrics();
+	
 	public static ArrayList<Point> props = new ArrayList<Point>();
 	static {
-		props.add(new Point(90d, 110.8000, "North Pole"));
+		/*props.add(new Point(90d, 110.8000, "North Pole"));
 		props.add(new Point(-90d, -110.8000, "South Pole"));
 		props.add(new Point(-33.870932d, 151.8000, "East"));
-		props.add(new Point(-33.870932d, 150.8000, "West"));
+		props.add(new Point(-33.870932d, 150.8000, "West"));*/
+		props.add(new Point(13.729735, 100.77589, "โรงอาหาร"));
+		props.add(new Point(13.7296216, 100.7750383, "หอพัก"));
 	}
 	
 	public DrawSurfaceView(Context c, Paint paint) {
@@ -37,10 +43,20 @@ public class DrawSurfaceView extends View {
 	
 	public DrawSurfaceView(Context context, AttributeSet set) {
 		super(context, set);
-		mPaint.setColor(Color.GREEN);
+		/*mPaint.setColor(Color.GREEN);
 		mPaint.setTextSize(50);
 		mPaint.setStrokeWidth(DpiUtils.getPxFromDpi(getContext(), 2));
-		mPaint.setAntiAlias(true);
+		mPaint.setAntiAlias(true);*/
+		
+		//Test Center
+		mPaint.setColor(Color.DKGRAY);
+        mPaint.setStyle(Style.FILL);
+        mPaint.setAlpha(100);
+        tPaint.setColor(Color.GREEN);
+        tPaint.setTextSize(50);
+		//tPaint.setTextAlign(Paint.Align.CENTER);
+		//tPaint.getFontMetrics(fm);
+		
 		
 		mSpots = new Bitmap[props.size()];
 		for (int i = 0; i < mSpots.length; i++) 
@@ -63,30 +79,44 @@ public class DrawSurfaceView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 
-		for (int i = 0; i < mBlips.length; i++) {
+		/*for (int i = 0; i < mBlips.length; i++) {
 			Bitmap blip = mBlips[i]; //we aren't drawing these yet
 			Bitmap spot = mSpots[i];
 			Point u = props.get(i);
 			
-			/*if (spot == null ||  blip == null)
-				continue;*/
+			if (spot == null ||  blip == null)
+				continue;
 			
-			if (spot == null)
+			int spotCentreX = spot.getWidth() / 2;
+			int spotCentreY = spot.getHeight() / 2;
+			
+			u.x = (float)screenWidth/3 * (i) - spotCentreX;
+			u.y = (float)screenHeight/2 + (50*i) - spotCentreY; 
+			
+			canvas.drawBitmap(spot, u.x, u.y, mPaint);
+			canvas.drawText(u.description, u.x, u.y, mPaint);
+		}*/
+		
+		for (int i = 0; i < mSpots.length; i++) {
+		    Bitmap spot = mSpots[i];
+		    Point u = props.get(i);
+
+		    if (spot == null)
 		        continue;
 
 		    double angle = bearing(me.latitude, me.longitude, u.latitude, u.longitude) - OFFSET;
 		    double xPos, yPos;
-			
+
 		    if(angle < 0)
 		        angle = (angle+360)%360;
 
 		    double posInPx = angle * (screenWidth / 90d);
-		    
-			int spotCentreX = spot.getWidth() / 2;
-			int spotCentreY = spot.getHeight() / 2;
-			xPos = posInPx - spotCentreX;
-			
-			if (angle <= 45) 
+
+		    int spotCentreX = spot.getWidth() / 2;
+		    int spotCentreY = spot.getHeight() / 2;
+		    xPos = posInPx - spotCentreX;
+
+		    if (angle <= 45) 
 		        u.x = (float) ((screenWidth / 2) + xPos);
 
 		    else if (angle >= 315) 
@@ -94,11 +124,15 @@ public class DrawSurfaceView extends View {
 
 		    else
 		        u.x = (float) (float)(screenWidth*9); //somewhere off the screen
-			
-			u.y = (float)screenHeight/2 + (50*i) - spotCentreY; 
-			
-			canvas.drawBitmap(spot, u.x, u.y, mPaint);
-			canvas.drawText(u.description, u.x, u.y, mPaint);
+
+		    u.y = (float)screenHeight/5 + spotCentreY;
+		    tPaint.setTextAlign(Paint.Align.CENTER);
+		    tPaint.getFontMetrics(fm);
+		    canvas.drawRect((u.x-20)-tPaint.measureText(u.description)/2, (u.y-20) - tPaint.getTextSize(), (u.x+20) + tPaint.measureText(u.description)/2, (u.y+20), mPaint);
+            canvas.drawText(u.description, u.x, u.y ,tPaint); //x=300,y=300    
+		    //canvas.drawBitmap(spot, u.x, u.y, mPaint); //camera spot
+		    //canvas.drawText(u.description, u.x, u.y, mPaint); //text
+		    //canvas.drawText(u.description, u.x, u.y + -(fm.ascent + fm.descent) / 2, tPaint);
 		}
 	}
 	
@@ -130,7 +164,7 @@ public class DrawSurfaceView extends View {
 
 		return dist * 1000;
 	}
-
+	
 	protected static double bearing(double lat1, double lon1, double lat2, double lon2) {
 		double longDiff = Math.toRadians(lon2 - lon1);
 		double la1 = Math.toRadians(lat1);

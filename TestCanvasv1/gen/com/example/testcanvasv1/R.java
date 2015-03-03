@@ -2033,7 +2033,7 @@ containing a value of this type.
         public static final int action_mode_bar=0x7f0b0041;
         public static final int action_mode_bar_stub=0x7f0b0040;
         public static final int action_mode_close_button=0x7f0b0033;
-        public static final int action_settings=0x7f0b0056;
+        public static final int action_settings=0x7f0b0055;
         public static final int activity_chooser_view_content=0x7f0b0034;
         public static final int activity_main=0x7f0b0052;
         public static final int always=0x7f0b0025;
@@ -2100,7 +2100,6 @@ containing a value of this type.
         public static final int submit_area=0x7f0b004f;
         public static final int tabMode=0x7f0b001e;
         public static final int terrain=0x7f0b000d;
-        public static final int textView1=0x7f0b0055;
         public static final int title=0x7f0b003a;
         public static final int top=0x7f0b0030;
         public static final int up=0x7f0b0001;
@@ -2335,11 +2334,13 @@ containing a value of this type.
         /** 
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+
     
 
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
+
         
 
         Base application theme for API 11+. This theme completely replaces
@@ -2683,6 +2684,7 @@ containing a value of this type.
          */
         public static final int Widget_AppCompat_Toolbar=0x7f050039;
         public static final int Widget_AppCompat_Toolbar_Button_Navigation=0x7f05003a;
+        public static final int my_style=0x7f0500f2;
     }
     public static final class styleable {
         /**  ============================================ 
